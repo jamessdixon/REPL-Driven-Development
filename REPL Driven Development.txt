@@ -1,0 +1,36 @@
+https://jamessdixon.wordpress.com/2015/07/28/the-wright-brothers-and-scrum/
+
+https://jamessdixon.wordpress.com/2015/08/04/f-repl-driven-development-and-scrum/
+
+
+Intro Poll
+Primary Language - C#, VB.NET, Java, Javascript, Other
+On the data server - sql server, no sql, other
+Star War s or Star Trek
+How much on the cloud: greater than 50% or not
+Visual Studio or Code
+Xamaerian or Phone Gap
+Breifs or Boxers
+Unit Tests or not
+Agile or Waterfall
+How many do agile
+
+Agile Manaifesto
+Bob Martin
+Andy Hunt
+Jeff Sutherland
+
+Scrum
+
+Back Story
+
+Wilber's idea
+C# and TDD
+F# in the REPL
+
+
+
+
+
+
+
