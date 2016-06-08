@@ -1,0 +1,146 @@
+1) Create Solution
+2) Create Bot Project
+3) Run the emulator
+
+4) Create FSharp Project (F# 4.3, .NET 4.6)
+5) Open Nuget and add FSharp.Data
+
+#r "../packages/FSharp.Data.2.3.0/lib/net40/FSharp.Data.dll"
+open FSharp.Data
+
+6) Open yahoo and show data
+  http://ichart.finance.yahoo.com/table.csv?s=MSFT
+  type YahooContext = CsvProvider<"http://ichart.finance.yahoo.com/table.csv?s=MSFT">
+  let stockInfo = YahooContext.Load("http://ichart.finance.yahoo.com/table.csv?s=MSFT")
+  let mostRecent = stockInfo.Rows |> Seq.head
+  mostRecent.``Adj Close``
+
+7) Bring in unhappy path
+  let stockInfo = YahooContext.Load("http://ichart.finance.yahoo.com/table.csv?s=&^%$")
+
+7) Move Over to .fs
+rename StockProvider.fs
+
+8) Add in exception handling
+        | :?  System.Net.WebException -> -1.0
+
+9) Add in unit test project
+10) Add in reference to FSharp 4.3 and StockAnalyzer
+11) Add in following Unit Tests
+        [TestMethod]
+        public void GetMostRecentCloseUsingValidInput_ReturnsExpected()
+        {
+            StockProvider provider = new StockProvider();
+            var nextPrice = provider.GetMostRecentPrice("MSFT");
+            Assert.IsNotNull(nextPrice);
+        }
+
+
+        [TestMethod]
+        public void GetMostRecentCloseUsingInValidInput_ReturnsExpected()
+        {
+            StockProvider provider = new StockProvider();
+            var nextPrice = provider.GetMostRecentPrice("&^%$");
+            Assert.AreEqual(-1, nextPrice);
+        }
+
+
+12) Add references in bot project
+	FSharp.Core (4.3)
+	Other Project
+
+13) Change response to
+                var stockProvider = new StockProvider();
+                var ticker = message.Text;
+                var currentPrice = stockProvider.GetMostRecentPrice(ticker);
+                var replyMessage = String.Empty;
+                if(currentPrice == -1)
+                {
+                    replyMessage = "Could not be found!";
+                }
+                else
+                {
+                    replyMessage = "The current price is " + currentPrice;
+                }
+                return message.CreateReplyMessage(replyMessage);
+
+
+
+1) Open Nuget and install-package FSharp.Charting
+
+2) Add references
+#load "../packages/FSharp.Charting.0.90.14/FSharp.Charting.fsx"
+
+open System
+open FSharp.Charting
+
+3) Create Chart
+let rows = YahooContext.Load("http://ichart.finance.yahoo.com/table.csv?s=MSFT").Rows
+rows 
+|> Seq.map(fun si -> si.Date, si.``Adj Close``)
+|> Chart.FastLine
+
+4) Show log
+
+5) Open Nuget and install-package Accord.Statistics
+
+6) Add in Accord Refereces
+#r "../packages/Accord.3.0.2/lib/net40/Accord.dll"
+#r "../packages/Accord.Statistics.3.0.2/lib/net40/Accord.Statistics.dll"
+#r "../packages/Accord.Math.3.0.2/lib/net40/Accord.Math.dll"
+open Accord
+open Accord.Statistics
+open Accord.Statistics.Models.Regression.Linear
+
+
+7) Add in code
+let x = rows |> Seq.map(fun si -> si.Date.ToOADate()) |> Seq.toArray
+let y = rows |> Seq.map(fun si -> (float)si.``Adj Close``) |> Seq.toArray
+
+8) Copy in code
+
+let regression = SimpleLinearRegression()
+let sse = regression.Regress(x,y)
+let mse = sse/float x.Length 
+let rmse = sqrt(mse)
+let r2 = regression.CoefficientOfDetermination(x,y)
+
+9) Type in code
+let tomorrow = [|(new DateTime(2016,5,19)).ToOADate()|]
+let predict =  regression.Compute(tomorrow)
+
+
+10) bring over to .fs file
+11) Add in Accord and System.Data references
+
+12) Go to Unit Test project and add this
+        [TestMethod]
+        public void PredictStockPriceUsingValidInput_ReturnsExpected()
+        {
+            StockProvider provider = new StockProvider();
+            var nextDate = DateTime.Now.AddDays(1);
+            var nextPrice = provider.PredictStockPrice("MSFT",nextDate);
+            Assert.IsNotNull(nextPrice);
+        }
+
+13) Go to to Bot and replace below replyMessage
+
+                var nextDate = DateTime.Now.AddDays(1);
+                var predictedPrice = stockProvider.PredictStockPrice(ticker, nextDate);
+                if (currentPrice == -1 || predictedPrice == -1)
+                {
+                    replyMessage = "Could not be found!";
+                }
+                else
+                {
+                    replyMessage = "The current price is " + currentPrice + " and the predicted price is " + predictedPrice;
+                }
+                return message.CreateReplyMessage(replyMessage);
+
+
+
+
+
+
+
+

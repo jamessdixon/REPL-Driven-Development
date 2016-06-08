@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace CustomerProcessor.CS
 {
     [Serializable]
-    public class NotificationException : Exception
+    public class NotificationException : CustomerProcessorException
     {
         public NotificationException() { }
         public NotificationException(string message) : base(message) { }
