@@ -109,8 +109,7 @@ namespace CustomerProcessor.CS
             {
                 throw new ArgumentNullException("customer");
             }
-            if (customer == null)
-            {
+            if (customer == null)          {
                 throw new ArgumentNullException("connectionString");
             }
 
